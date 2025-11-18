@@ -1,47 +1,48 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Header from "@/components/layout/Header";
 import UserCard from "@/components/common/UserCard";
-import { UserProps } from "@/interfaces";
+import { type UserProps } from "@/interfaces";
 
-const Users = () => {
-  const [users, setUsers] = useState<UserProps[]>([]);
-  const [loading, setLoading] = useState(true);
+interface UsersPageProps {
+  users: UserProps[];
+}
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch("https://jsonplaceholder.typicode.com/users");
-        const data = await res.json();
-        setUsers(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, []);
-
+const UsersPage: React.FC<UsersPageProps> = ({ users }) => {
   return (
-    <div style={{ padding: "24px" }}>
+    <div className="p-6">
       <Header />
-      <h1>Users Page</h1>
-      {loading ? (
-        <p>Loading users...</p>
-      ) : (
-        users.map((user) => (
-          <UserCard
-            key={user.id}
-            id={user.id}
-            name={user.name}
-            email={user.email}
-            address={user.address}
-          />
-        ))
-      )}
+      <h1 className="text-2xl font-bold mb-4">Users Page</h1>
+      {users.map((user) => (
+        <UserCard
+          key={user.id}
+          id={user.id}
+          name={user.name}
+          email={user.email}
+          address={user.address}
+        />
+      ))}
     </div>
   );
 };
 
-export default Users;
+// Fetch user data at build time
+export const getStaticProps = async () => {
+  const res = await fetch("https://jsonplaceholder.typicode.com/users");
+  const data = await res.json();
+
+  // Map API response to UserProps
+  const users: UserProps[] = data.map((user: any) => ({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    address: user.address,
+  }));
+
+  return {
+    props: {
+      users,
+    },
+  };
+};
+
+export default UsersPage;
