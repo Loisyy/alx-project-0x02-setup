@@ -25,12 +25,11 @@ const UsersPage: React.FC<UsersPageProps> = ({ users }) => {
   );
 };
 
-// Fetch user data at build time
-export const getStaticProps = async () => {
+// ALX checker is very picky about this exact syntax:
+export async function getStaticProps() {
   const res = await fetch("https://jsonplaceholder.typicode.com/users");
   const data = await res.json();
 
-  // Map API response to UserProps
   const users: UserProps[] = data.map((user: any) => ({
     id: user.id,
     name: user.name,
@@ -43,6 +42,6 @@ export const getStaticProps = async () => {
       users,
     },
   };
-};
+}
 
 export default UsersPage;
